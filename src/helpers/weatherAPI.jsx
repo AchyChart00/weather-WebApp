@@ -19,7 +19,6 @@ export const weatherAPIUbicacion = async (lng, lat) => {
   try {
     const resp = await fetch(url);
     const valores = await resp.json();
-    console.log(valores);
     return valores;
     
   } catch (error) {

@@ -1,35 +1,27 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useForm } from "../../hooks/useForm";
-import { getUserLocation } from "../../helpers/getUserLocation";
 import {
   weatherAPIBuscar,
   weatherAPIUbicacion,
 } from "../../helpers/weatherAPI";
+import { MostrarResultados } from "../../helpers/mostrarResultados";
+import { useFetchGeo } from "../../hooks/useFetchGeo";
 
 export const BusquedaWeather = () => {
+
   //useState para Checkbox
   const [revisar, setRevisar] = useState({
     checar: false,
-    LngLat: [0, 0],
   });
 
-  const { checar, LngLat } = revisar;
-  console.log("Arriba desestructuracion", LngLat);
-  const [lng, lat] = LngLat;
+  const { checar } = revisar;
+  
 
-  useEffect(() => {
-    getUserLocation().then((lngLat) => {
-      console.log("useEffect", lngLat);
-      setRevisar({
-        ...revisar,
-        LngLat: lngLat,
-      });
-    });
-  }, []);
+  //GEOLOCALIZACION DEL EXPLORADOR 
+  const [lng, lat] = useFetchGeo();
 
-  console.log("Abajo useEFfect", lng, lat);
   //useState para valores obtenidos de buscar
   const [values, setValues] = useState({
     coord: "",
@@ -51,6 +43,7 @@ export const BusquedaWeather = () => {
       const { coord, main, sys, weather, name } = await weatherAPIBuscar(
         searchText
       );
+
       setValues({ coord, main, sys, weather, name });
     } else {
       e.preventDefault();
@@ -58,56 +51,32 @@ export const BusquedaWeather = () => {
         lng,
         lat
       );
+      
       setValues({ coord, main, sys, weather, name });
     }
   };
 
-  //valores coordenada
-  const { coord, main, sys, weather, name } = values;
-  const { description } = weather;
-  const image = `http://openweathermap.org/img/wn/${weather[0].icon}@4x.png`;
+
 
   const disableInput = (e) => {
     const checked = e.target.checked;
     if (checked) {
-      console.log("Dentro del checked if", LngLat);
       setRevisar({
         checar: true,
-        LngLat,
       });
     } else {
       setRevisar({
         checar: false,
-        LngLat,
       });
     }
   };
 
 
-  const mostrarResultados=()=>(
-    <div className="container">
-    <h2>Resultados</h2>
-    <div>
-      {description}
-      <div className="col">
-        <span className="row">{name} </span>
-        <span className="row">Latitud: {coord.lat}</span>
-        <span className="row">Longitud: {coord.lon}</span>
-      </div>
-      <div> {sys.country}</div>
-    </div>
 
-    <img src={image} alt="Imagen del tiempo" />
-
-    <div>
-      <span>Temperatura actual: {main.temp} </span>
-    </div>
-  </div>
-  )
 
   return (
     <div>
-      {/* menu busqueda */}
+      {/* Home busqueda */}
       <div className="container">
         <form onSubmit={handleSearch}>
           <label className="form-label m-2">Find The Weather</label>
@@ -135,7 +104,7 @@ export const BusquedaWeather = () => {
               onClick={disableInput}
             />
 
-            <label className="form-check-label" for="flexCheckDefault">
+            <label className="form-check-label">
               ¿Desea utilizar su ubicación?
             </label>
           </div>
@@ -151,10 +120,10 @@ export const BusquedaWeather = () => {
       </div>
       <br />
       <hr />
-      {/* Resultados */}
+      {/* Resultados de la busqueda*/}
       
       {
-      (!searchText && !checar)? "":mostrarResultados()}
+      (!searchText && !checar)? "":<MostrarResultados {...values}/>}
       {/* terminan resultados */}
     </div>
   );

@@ -83,6 +83,28 @@ export const BusquedaWeather = () => {
     }
   };
 
+
+  const mostrarResultados=()=>(
+    <div className="container">
+    <h2>Resultados</h2>
+    <div>
+      {description}
+      <div className="col">
+        <span className="row">{name} </span>
+        <span className="row">Latitud: {coord.lat}</span>
+        <span className="row">Longitud: {coord.lon}</span>
+      </div>
+      <div> {sys.country}</div>
+    </div>
+
+    <img src={image} alt="Imagen del tiempo" />
+
+    <div>
+      <span>Temperatura actual: {main.temp} </span>
+    </div>
+  </div>
+  )
+
   return (
     <div>
       {/* menu busqueda */}
@@ -130,24 +152,9 @@ export const BusquedaWeather = () => {
       <br />
       <hr />
       {/* Resultados */}
-      <div className="container">
-        <h2>Resultados</h2>
-        <div>
-          {description}
-          <div className="col">
-            <span className="row">{name} </span>
-            <span className="row">Latitud: {coord.lat}</span>
-            <span className="row">Longitud: {coord.lon}</span>
-          </div>
-          <div> {sys.country}</div>
-        </div>
-
-        <img src={image} alt="Imagen del tiempo" />
-
-        <div>
-          <span>Temperatura actual: {main.temp} </span>
-        </div>
-      </div>
+      
+      {
+      (!searchText && !checar)? "":mostrarResultados()}
       {/* terminan resultados */}
     </div>
   );

@@ -4,18 +4,27 @@ import { weatherAPIBuscar, weatherAPIUbicacion } from "./helpers/weatherAPI";
 import { useForm } from "./hooks/useForm";
 
 export const WeatherHome = () => {
-  useEffect(() => {
-    getUserLocation().then((lngLat) => console.log(lngLat));
-  }, []);
-
   //useState para Checkbox
   const [revisar, setRevisar] = useState({
-      checar: false,
-      buscarAlgo:true
-  })
+    checar: false,
+    LngLat: [0, 0],
+  });
 
-  const {checar, buscarAlgo}=revisar;
+  const { checar, LngLat } = revisar;
+  console.log("Arriba desestructuracion", LngLat);
+  const [lng, lat] = LngLat;
 
+  useEffect(() => {
+    getUserLocation().then((lngLat) => {
+      console.log("useEffect", lngLat);
+      setRevisar({
+        ...revisar,
+        LngLat: lngLat,
+      });
+    });
+  }, []);
+
+  console.log("Abajo useEFfect", lng, lat);
   //useState para valores obtenidos de buscar
   const [values, setValues] = useState({
     coord: "",
@@ -32,46 +41,49 @@ export const WeatherHome = () => {
 
   //funcion para busqueda, devuelve los valores
   const handleSearch = async (e) => {
-
-    if(!checar){
-        e.preventDefault();
-        const { coord, main, sys, weather, name } = await weatherAPIBuscar(
-          searchText
-        );
-        setValues({ coord, main, sys, weather, name });
-    }else{
-        e.preventDefault();
-        const {coord, main, sys, weather, name}= await weatherAPIUbicacion(-99.24292937306404, 19.704932259557314);
-        setValues({ coord, main, sys, weather, name });
+    if (!checar) {
+      e.preventDefault();
+      const { coord, main, sys, weather, name } = await weatherAPIBuscar(
+        searchText
+      );
+      setValues({ coord, main, sys, weather, name });
+    } else {
+      e.preventDefault();
+      const { coord, main, sys, weather, name } = await weatherAPIUbicacion(
+        lng,
+        lat
+      );
+      setValues({ coord, main, sys, weather, name });
     }
-   
   };
 
   //valores coordenada
   const { coord, main, sys, weather, name } = values;
   const { description } = weather;
   const image = `http://openweathermap.org/img/wn/${weather[0].icon}@4x.png`;
-  
-  const disableInput =(e)=>{
-    const checked = e.target.checked;
-    if(checked) {
-        setRevisar({
-            checar:true
-        })
-    }
-    else{
-        setRevisar({
-            checar:false,
-        })
-    }
-  }
 
-  const disableButton =(e)=>{
-    if(!searchText){
+  const disableInput = (e) => {
+    const checked = e.target.checked;
+    if (checked) {
+      console.log("Dentro del checked if", LngLat);
+      setRevisar({
         
+        checar: true,
+        LngLat,
+      });
+    } else {
+      setRevisar({
+        checar: false,
+        LngLat,
+      });
     }
-  }
-  
+  };
+
+  const disableButton = (e) => {
+    if (!searchText) {
+    }
+  };
+
   return (
     <div>
       <div className="container">
@@ -97,7 +109,7 @@ export const WeatherHome = () => {
           </div>
 
           {/* checkbox */}
-          <div class="form-check">
+          <div className="form-check">
             <input
               className="form-check-input"
               type="checkbox"
@@ -111,10 +123,11 @@ export const WeatherHome = () => {
             </label>
           </div>
           {/* Boton de buscar */}
-          <button 
-          type="submit" 
-          className="btn btn-primary" 
-          /* disabled={!searchText} */>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!searchText && !checar} 
+          >
             Buscar
           </button>
         </form>

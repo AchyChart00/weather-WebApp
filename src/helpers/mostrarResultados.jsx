@@ -1,9 +1,17 @@
 import React from "react";
-export const MostrarResultados = ({coord, main, sys, weather, name}) => {
+export const MostrarResultados = ({ coord, main, sys, weather, name }) => {
+  //valores coordenada
+  const { description } = weather[0];
 
-      //valores coordenada
-  const { description } = weather;
   const image = `http://openweathermap.org/img/wn/${weather[0].icon}@4x.png`;
+
+  console.log("Description", typeof (description));
+  console.log("name", typeof (name));
+  console.log("lat", typeof (coord.lat));
+  console.log("lon", typeof (coord.lon));
+  console.log("country", typeof (sys.country));
+  console.log("image", typeof (image));
+  console.log("main", typeof (main.temp));
 
   return (
     <div className="container">

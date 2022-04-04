@@ -1,4 +1,5 @@
 import React from "react";
+import { useAgregarBusqueda } from "../hooks/useObtenerHistorial";
 export const MostrarResultados = ({ coord, main, sys, weather, name }) => {
   //valores coordenada
   const { description } = weather[0];
@@ -12,6 +13,23 @@ export const MostrarResultados = ({ coord, main, sys, weather, name }) => {
   console.log("country", typeof (sys.country));
   console.log("image", typeof (image));
   console.log("main", typeof (main.temp));
+
+  if(description){
+    const data = {
+      des: description,
+      nombre: name, 
+      lat: coord.lat, 
+      lon: coord.lon,
+      country: sys.country, 
+      img: image,
+      temp: main.temp
+  
+    }
+    useAgregarBusqueda(data);
+  }
+  
+
+  
 
   return (
     <div className="container">
